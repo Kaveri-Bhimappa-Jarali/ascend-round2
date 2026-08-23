@@ -164,6 +164,18 @@ class PDFReportGenerator:
             alignment=TA_CENTER
         )
 
+        header_cell_center = ParagraphStyle(
+            'HeaderCellCenter',
+            parent=cell_center,
+            textColor=colors.white
+        )
+
+        header_cell_left = ParagraphStyle(
+            'HeaderCellLeft',
+            parent=cell_style,
+            textColor=colors.white
+        )
+
         story = []
 
         # Title Block
@@ -206,11 +218,11 @@ class PDFReportGenerator:
         status_color = "#ef4444" if non_compliant_res > 0 else "#10b981"
         
         summary_headers = [
-            Paragraph("<b>Overall Status</b>", cell_center),
-            Paragraph("<b>Compliance Rate</b>", cell_center),
-            Paragraph("<b>Total Scanned</b>", cell_center),
-            Paragraph("<b>Compliant</b>", cell_center),
-            Paragraph("<b>Non-Compliant</b>", cell_center)
+            Paragraph("<b>Overall Status</b>", header_cell_center),
+            Paragraph("<b>Compliance Rate</b>", header_cell_center),
+            Paragraph("<b>Total Scanned</b>", header_cell_center),
+            Paragraph("<b>Compliant</b>", header_cell_center),
+            Paragraph("<b>Non-Compliant</b>", header_cell_center)
         ]
         
         summary_values = [
@@ -232,9 +244,7 @@ class PDFReportGenerator:
             ('INNERGRID', (0,0), (-1,-1), 0.5, colors.HexColor('#cbd5e1')),
         ]))
         
-        # Override headers text color to white
-        for h in summary_headers:
-            h.style.textColor = colors.white
+        # Summary table styling complete
             
         story.append(Paragraph("Executive Compliance Summary", section_style))
         story.append(summary_table)
@@ -275,12 +285,12 @@ class PDFReportGenerator:
         else:
             col_widths = [45, 60, 95, 90, 50, 200]
             violation_headers = [
-                Paragraph("<b>Provider</b>", cell_style),
-                Paragraph("<b>Type</b>", cell_style),
-                Paragraph("<b>Resource Name</b>", cell_style),
-                Paragraph("<b>Rule</b>", cell_style),
-                Paragraph("<b>Severity</b>", cell_style),
-                Paragraph("<b>Message</b>", cell_style)
+                Paragraph("<b>Provider</b>", header_cell_left),
+                Paragraph("<b>Type</b>", header_cell_left),
+                Paragraph("<b>Resource Name</b>", header_cell_left),
+                Paragraph("<b>Rule</b>", header_cell_left),
+                Paragraph("<b>Severity</b>", header_cell_left),
+                Paragraph("<b>Message</b>", header_cell_left)
             ]
             
             table_rows = [violation_headers]
@@ -320,9 +330,7 @@ class PDFReportGenerator:
                 ('BOX', (0,0), (-1,-1), 1, colors.HexColor('#0f172a')),
             ]))
             
-            # Apply white header styling
-            for h in violation_headers:
-                h.style.textColor = colors.white
+            # Violation headers styling complete
                 
             story.append(violations_table)
 
