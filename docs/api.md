@@ -72,6 +72,7 @@
   "total_resources": 50,
   "compliant_resources": 35,
   "non_compliant_resources": 15,
+  "total_violations": 15,
   "compliance_percentage": 70.0,
   "violations_by_severity": {
     "CRITICAL": 0,
@@ -80,6 +81,7 @@
     "LOW": 0
   }
 }
+
 ```
 
 ### 5. Get JSON Compliance Audit Report
