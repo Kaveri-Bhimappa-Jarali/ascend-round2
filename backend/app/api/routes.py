@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.api.schemas import (
     ComplianceSummaryResponse,
+    JSONReportResponse,
     ResourceEvaluationResponse,
     ResourceInput,
     ViolationResponse,
@@ -48,7 +49,6 @@ def evaluate_resources(
             unique_models.append(ResourceModel(**resource.model_dump()))
     evaluations = service.evaluate_resources(unique_models)
 
-
     return [
         ResourceEvaluationResponse(
             provider=evaluation.resource.provider,
@@ -89,3 +89,11 @@ def get_compliance_summary(session: Session = Depends(get_session)) -> dict[str,
 
     service = ComplianceService(session)
     return service.get_summary()
+
+
+@router.get("/reports/json", response_model=JSONReportResponse)
+def get_json_report(session: Session = Depends(get_session)) -> dict[str, object]:
+    """Generate and return complete multi-cloud compliance audit report in JSON format."""
+
+    service = ComplianceService(session)
+    return service.generate_json_report()

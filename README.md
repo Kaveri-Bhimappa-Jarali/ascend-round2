@@ -27,13 +27,15 @@ The **AWS Cloud Integration** and **GCP Cloud Integration** modules are fully im
 
 ## 🛠️ Project Structure
 * **`backend/`**: FastAPI backend application with Compliance Engine and Database layers.
+  * **`backend/seed_demo_data.py`**: Seeder CLI to populate SQLite with sample AWS & GCP resources and export JSON report.
   * **`backend/run_all_scans.py`**: Combined CLI utility to scan and output both AWS and GCP resources.
   * **`backend/run_aws_scan.py`**: Independent CLI utility to scan and output AWS resources.
   * **`backend/run_gcp_scan.py`**: Independent CLI utility to scan and output GCP resources.
 * **`frontend/`**: Vite + React frontend dashboard.
-* **`reports/`**: PDF/HTML compliance report generator module.
+* **`reports/`**: JSON compliance report generator module (`JSONReportGenerator`).
 * **`demo/`**: Mock data, walkthrough scripts, and visuals.
 * **`docs/`**: Detailed project documentation (Architecture, APIs, Rules, Setup).
+
 
 ---
 

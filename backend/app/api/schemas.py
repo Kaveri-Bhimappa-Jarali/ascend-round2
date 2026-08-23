@@ -44,6 +44,20 @@ class ComplianceSummaryResponse(BaseModel):
     compliance_percentage: float
 
 
+class ReportMetadataSchema(BaseModel):
+    report_id: str
+    schema_version: str
+    generated_at: str
+    environment: str
+
+
+class JSONReportResponse(BaseModel):
+    metadata: ReportMetadataSchema
+    summary: ComplianceSummaryResponse
+    resources: list[dict[str, Any]]
+    violations: list[dict[str, Any]]
+
+
 class ResourceDBResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -73,9 +73,67 @@
   "compliant_resources": 35,
   "non_compliant_resources": 15,
   "compliance_percentage": 70.0,
-  "critical": 0,
-  "high": 10,
-  "medium": 5,
-  "low": 0
+  "violations_by_severity": {
+    "CRITICAL": 0,
+    "HIGH": 10,
+    "MEDIUM": 5,
+    "LOW": 0
+  }
 }
 ```
+
+### 5. Get JSON Compliance Audit Report
+* **URI**: `GET /api/reports/json`
+* **Response**:
+```json
+{
+  "metadata": {
+    "report_id": "b74df4e1-1936-4cc1-99e6-9528823b1bfb",
+    "schema_version": "1.0.0",
+    "generated_at": "2026-08-23T05:18:13.823956+00:00",
+    "environment": "production"
+  },
+  "summary": {
+    "total_resources": 6,
+    "compliant_resources": 2,
+    "non_compliant_resources": 4,
+    "total_violations": 7,
+    "compliance_percentage": 33.33,
+    "violations_by_severity": {
+      "CRITICAL": 0,
+      "HIGH": 5,
+      "MEDIUM": 2,
+      "LOW": 0
+    }
+  },
+  "resources": [
+    {
+      "provider": "AWS",
+      "resource_type": "storage",
+      "resource_id": "demo-aws-s3-compliant",
+      "resource_name": "aws-prod-data-bucket",
+      "status": "COMPLIANT",
+      "configuration": {
+        "encryption_enabled": true,
+        "logging_enabled": true,
+        "public_access": false
+      },
+      "last_seen": "2026-08-23T05:18:13.740474"
+    }
+  ],
+  "violations": [
+    {
+      "provider": "AWS",
+      "resource_type": "storage",
+      "resource_id": "demo-aws-s3-non-compliant",
+      "resource_name": "aws-public-unencrypted-bucket",
+      "rule_id": "ENCRYPTION_REQUIRED",
+      "severity": "HIGH",
+      "message": "Resource encryption is disabled",
+      "status": "FAIL",
+      "detected_at": "2026-08-23T05:18:13.760381"
+    }
+  ]
+}
+```
+
