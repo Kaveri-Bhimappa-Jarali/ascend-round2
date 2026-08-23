@@ -33,20 +33,30 @@ def _violation_to_response(violation: ViolationDB) -> ViolationResponse:
 
 @router.post("/resources/evaluate", response_model=list[ResourceEvaluationResponse])
 def evaluate_resources(
-    resources: list[ResourceInput],
+    resources: list[ResourceInput] | None = None,
     session: Session = Depends(get_session),
 ) -> list[ResourceEvaluationResponse]:
     """Evaluate resource configurations against active compliance policies."""
 
     service = ComplianceService(session)
-    seen = set()
-    unique_models = []
-    for resource in resources:
-        key = (resource.provider, resource.resource_type, resource.resource_id)
-        if key not in seen:
-            seen.add(key)
-            unique_models.append(ResourceModel(**resource.model_dump()))
-    evaluations = service.evaluate_resources(unique_models)
+    
+    if resources is None:
+        # Dynamically load collectors to fetch resources if none are passed in the request body
+        from app.collectors.aws import AWSCollector
+        from app.collectors.gcp import GCPCollector
+        
+        aws_res = AWSCollector().collect_resources()
+        gcp_res = GCPCollector().collect_resources()
+        evaluations = service.evaluate_resources(aws_res + gcp_res)
+    else:
+        seen = set()
+        unique_models = []
+        for resource in resources:
+            key = (resource.provider, resource.resource_type, resource.resource_id)
+            if key not in seen:
+                seen.add(key)
+                unique_models.append(ResourceModel(**resource.model_dump()))
+        evaluations = service.evaluate_resources(unique_models)
 
 
     return [
