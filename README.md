@@ -27,6 +27,7 @@ The **AWS Cloud Integration** and **GCP Cloud Integration** modules are fully im
 
 ## 🛠️ Project Structure
 * **`backend/`**: FastAPI backend application with Compliance Engine and Database layers.
+  * **`backend/run_all_scans.py`**: Combined CLI utility to scan and output both AWS and GCP resources.
   * **`backend/run_aws_scan.py`**: Independent CLI utility to scan and output AWS resources.
   * **`backend/run_gcp_scan.py`**: Independent CLI utility to scan and output GCP resources.
 * **`frontend/`**: Vite + React frontend dashboard.
@@ -47,6 +48,14 @@ The **AWS Cloud Integration** and **GCP Cloud Integration** modules are fully im
    pip install -r requirements.txt
    ```
 3. Run the CLI tools:
+   * **Combined Scanner (Demo Mode)**:
+     ```bash
+     python run_all_scans.py --demo
+     ```
+   * **Combined Scanner (Real Scan)**:
+     ```bash
+     python run_all_scans.py --real
+     ```
    * **AWS Scanner (Demo Mode)**:
      ```bash
      python run_aws_scan.py --demo
