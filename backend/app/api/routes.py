@@ -90,32 +90,3 @@ def get_compliance_summary(session: Session = Depends(get_session)) -> dict[str,
     service = ComplianceService(session)
     return service.get_summary()
 
-
-@router.get("/compliance/report")
-def get_compliance_report(session: Session = Depends(get_session)) -> dict[str, object]:
-    """Generate a compliance status report in JSON format."""
-    import datetime
-
-    service = ComplianceService(session)
-    summary = service.get_summary()
-    violations = [_violation_to_response(v) for v in service.get_violations()]
-    
-    return {
-        "report_title": "CloudCompliance Sentinel Audit Report",
-        "generated_at": datetime.datetime.now().isoformat(),
-        "summary": summary,
-        "violations": [
-            {
-                "provider": v.provider,
-                "resource_type": v.resource_type,
-                "resource_id": v.resource_id,
-                "resource_name": v.resource_name,
-                "rule_id": v.rule_id,
-                "severity": v.severity,
-                "message": v.message,
-                "status": v.status,
-            }
-            for v in violations
-        ]
-    }
-

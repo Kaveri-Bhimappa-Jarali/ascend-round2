@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertCircle, RefreshCw, Layers, Database, ShieldAlert, Cpu, Download } from 'lucide-react';
-import { getComplianceSummary, getViolations, triggerResourceEvaluation, getComplianceReport } from './services/api';
+import { Shield, AlertCircle, RefreshCw, Layers, Database, ShieldAlert, Cpu } from 'lucide-react';
+import { getComplianceSummary, getViolations, triggerResourceEvaluation } from './services/api';
 import ComplianceRing from './components/ComplianceRing';
 import MetricCard from './components/MetricCard';
 import ProviderCard from './components/ProviderCard';
@@ -15,7 +15,6 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
   // Core Data Fetching
   const fetchData = async (showLoadingSpinner = false) => {
@@ -94,24 +93,6 @@ export default function App() {
     }
   };
 
-  // Generate and download audit report
-  const handleDownloadReport = async () => {
-    setDownloading(true);
-    try {
-      const reportResp = await getComplianceReport();
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportResp.data, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `sentinel-compliance-report-${new Date().toISOString().slice(0, 10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    } catch (err) {
-      console.error('Report download failed:', err);
-    } finally {
-      setDownloading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -199,55 +180,30 @@ export default function App() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button
-            onClick={handleDownloadReport}
-            disabled={downloading}
-            style={{
-              backgroundColor: 'rgba(30, 41, 59, 0.6)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '8px',
-              padding: '0.6rem 1.25rem',
-              fontSize: '0.875rem',
-              fontWeight: 700,
-              cursor: downloading ? 'not-allowed' : 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              opacity: downloading ? 0.7 : 1,
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <Download size={16} />
-            {downloading ? 'Downloading...' : 'Download Report'}
-          </button>
-
-          <button
-            onClick={handleTriggerScan}
-            disabled={refreshing}
-            style={{
-              backgroundColor: 'var(--sky-blue)',
-              color: '#020617',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.6rem 1.25rem',
-              fontSize: '0.875rem',
-              fontWeight: 700,
-              cursor: refreshing ? 'not-allowed' : 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              opacity: refreshing ? 0.7 : 1,
-              transition: 'opacity 0.2s ease'
-            }}
-          >
-            <RefreshCw size={16} className={refreshing ? 'spin-anim' : ''} style={{
-              animation: refreshing ? 'spin 1s linear infinite' : 'none'
-            }} />
-            {refreshing ? 'Re-scanning...' : 'Refresh Scan'}
-          </button>
-        </div>
+        <button
+          onClick={handleTriggerScan}
+          disabled={refreshing}
+          style={{
+            backgroundColor: 'var(--sky-blue)',
+            color: '#020617',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.6rem 1.25rem',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            cursor: refreshing ? 'not-allowed' : 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            opacity: refreshing ? 0.7 : 1,
+            transition: 'opacity 0.2s ease'
+          }}
+        >
+          <RefreshCw size={16} className={refreshing ? 'spin-anim' : ''} style={{
+            animation: refreshing ? 'spin 1s linear infinite' : 'none'
+          }} />
+          {refreshing ? 'Re-scanning...' : 'Refresh Scan'}
+        </button>
       </header>
 
       {/* Main Layout Grid */}
