@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertCircle, RefreshCw, Layers, Database, ShieldAlert, Cpu } from 'lucide-react';
+import { Shield, AlertCircle, RefreshCw, Layers, Database, ShieldAlert, Cpu, Download } from 'lucide-react';
 import { getComplianceSummary, getViolations, triggerResourceEvaluation } from './services/api';
 import ComplianceRing from './components/ComplianceRing';
 import MetricCard from './components/MetricCard';
@@ -180,30 +180,56 @@ export default function App() {
           </p>
         </div>
 
-        <button
-          onClick={handleTriggerScan}
-          disabled={refreshing}
-          style={{
-            backgroundColor: 'var(--sky-blue)',
-            color: '#020617',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.6rem 1.25rem',
-            fontSize: '0.875rem',
-            fontWeight: 700,
-            cursor: refreshing ? 'not-allowed' : 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            opacity: refreshing ? 0.7 : 1,
-            transition: 'opacity 0.2s ease'
-          }}
-        >
-          <RefreshCw size={16} className={refreshing ? 'spin-anim' : ''} style={{
-            animation: refreshing ? 'spin 1s linear infinite' : 'none'
-          }} />
-          {refreshing ? 'Re-scanning...' : 'Refresh Scan'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <a
+            href="http://localhost:8000/api/reports/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '0.6rem 1.25rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
+          >
+            <Download size={16} />
+            Download PDF Report
+          </a>
+
+          <button
+            onClick={handleTriggerScan}
+            disabled={refreshing}
+            style={{
+              backgroundColor: 'var(--sky-blue)',
+              color: '#020617',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.6rem 1.25rem',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              cursor: refreshing ? 'not-allowed' : 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              opacity: refreshing ? 0.7 : 1,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            <RefreshCw size={16} className={refreshing ? 'spin-anim' : ''} style={{
+              animation: refreshing ? 'spin 1s linear infinite' : 'none'
+            }} />
+            {refreshing ? 'Re-scanning...' : 'Refresh Scan'}
+          </button>
+        </div>
       </header>
 
       {/* Main Layout Grid */}

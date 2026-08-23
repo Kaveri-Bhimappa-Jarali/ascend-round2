@@ -141,6 +141,28 @@ def test_get_json_report_api_endpoint() -> None:
     assert payload["summary"]["compliance_percentage"] == 100.0
 
 
+def test_get_pdf_report_api_endpoint() -> None:
+    with client() as test_client:
+        test_client.post(
+            "/api/resources/evaluate",
+            json=[
+                {
+                    "provider": "AWS",
+                    "resource_type": "storage",
+                    "resource_id": "api-bucket",
+                    "resource_name": "api-bucket",
+                    "configuration": {"encryption_enabled": True, "logging_enabled": True, "public_access": False},
+                }
+            ],
+        )
+
+        response = test_client.get("/api/reports/pdf")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert len(response.content) > 0
+
+
 def test_demo_seeder_execution() -> None:
     summary = seed_database(reset=True, export_report=False)
 

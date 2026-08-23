@@ -54,3 +54,14 @@ class ComplianceService:
         if output_path:
             self.report_generator.export_json(report_dict, output_path)
         return report_dict
+
+    def generate_pdf_report(
+        self,
+        output_path: Path | str | None = None,
+        environment: str = "production",
+    ) -> Path:
+        from reports.report_generator import PDFReportGenerator
+        report_data = self.repository.get_full_report_data()
+        report_dict = self.report_generator.build_report(report_data, environment=environment)
+        pdf_gen = PDFReportGenerator()
+        return pdf_gen.export_pdf(report_dict, output_path)
