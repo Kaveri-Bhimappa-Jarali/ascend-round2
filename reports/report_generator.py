@@ -175,6 +175,10 @@ class PDFReportGenerator:
         meta_id = report_dict["metadata"]["report_id"]
         meta_time = report_dict["metadata"]["generated_at"]
         meta_env = report_dict["metadata"]["environment"]
+        resources = report_dict.get("resources", [])
+        is_demo = any(r.get("resource_id", "").startswith("demo-") for r in resources)
+        if is_demo or meta_env.lower() in ["demo", "simulated"]:
+            meta_env = "DEMO / SIMULATED"
         
         meta_data = [
             [Paragraph("<b>Audit ID:</b>", cell_style), Paragraph(meta_id, cell_style)],
@@ -245,10 +249,10 @@ class PDFReportGenerator:
         ]
         severity_rows = [
             severity_headers,
-            [Paragraph("<font color='#ef4444'><b>CRITICAL</b></font>", cell_style), Paragraph(str(severity_counts.get("CRITICAL", 0)), cell_center), Paragraph("Immediate security drift. Requires isolation.", cell_style)],
-            [Paragraph("<font color='#ef4444'><b>HIGH</b></font>", cell_style), Paragraph(str(severity_counts.get("HIGH", 0)), cell_center), Paragraph("Encryption missing or publicly exposed access.", cell_style)],
-            [Paragraph("<font color='#f59e0b'><b>MEDIUM</b></font>", cell_style), Paragraph(str(severity_counts.get("MEDIUM", 0)), cell_center), Paragraph("Audit logging disabled or config logging missing.", cell_style)],
-            [Paragraph("<font color='#38bdf8'><b>LOW</b></font>", cell_style), Paragraph(str(severity_counts.get("LOW", 0)), cell_center), Paragraph("Validation policies drift warning.", cell_style)]
+            [Paragraph("<font color='#ef4444'><b>CRITICAL</b></font>", cell_style), Paragraph(str(severity_counts.get("CRITICAL", 0)), cell_center), Paragraph("Immediate security risk requiring urgent action.", cell_style)],
+            [Paragraph("<font color='#ef4444'><b>HIGH</b></font>", cell_style), Paragraph(str(severity_counts.get("HIGH", 0)), cell_center), Paragraph("Encryption disabled or public access detected.", cell_style)],
+            [Paragraph("<font color='#f59e0b'><b>MEDIUM</b></font>", cell_style), Paragraph(str(severity_counts.get("MEDIUM", 0)), cell_center), Paragraph("Audit/logging configuration is disabled or missing.", cell_style)],
+            [Paragraph("<font color='#38bdf8'><b>LOW</b></font>", cell_style), Paragraph(str(severity_counts.get("LOW", 0)), cell_center), Paragraph("Minor compliance configuration drift.", cell_style)]
         ]
         severity_table = Table(severity_rows, colWidths=[120, 80, 340])
         severity_table.setStyle(TableStyle([
