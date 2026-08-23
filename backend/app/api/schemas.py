@@ -50,6 +50,10 @@ class ComplianceSummaryResponse(BaseModel):
     violations_by_severity: dict[str, int]
     compliance_percentage: float
     providers: dict[str, ProviderStats] | None = None
+    critical: int = 0
+    high: int = 0
+    medium: int = 0
+    low: int = 0
 
 
 class ResourceDBResponse(BaseModel):

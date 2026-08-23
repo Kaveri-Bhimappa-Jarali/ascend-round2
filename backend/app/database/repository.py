@@ -171,4 +171,8 @@ class ComplianceRepository:
             "violations_by_severity": violations_by_severity,
             "compliance_percentage": compliance_percentage,
             "providers": providers,
+            "critical": violations_by_severity.get("CRITICAL", 0),
+            "high": violations_by_severity.get("HIGH", 0),
+            "medium": violations_by_severity.get("MEDIUM", 0),
+            "low": violations_by_severity.get("LOW", 0),
         }
