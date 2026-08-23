@@ -86,6 +86,7 @@
 
 ### 5. Get JSON Compliance Audit Report
 * **URI**: `GET /api/reports/json`
+* **Note**: The `resources` and `violations` array lists in the example response below are abbreviated for documentation brevity.
 * **Response**:
 ```json
 {
@@ -138,4 +139,5 @@
   ]
 }
 ```
+
 
