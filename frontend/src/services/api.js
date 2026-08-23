@@ -17,14 +17,21 @@ async function apiFetch(endpoint, options = {}) {
     return { data: getFallbackData(endpoint), isMock: true };
   }
 
+  // Set up a 3-second timeout abort signal
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      signal: controller.signal,
       ...options,
     });
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       throw new Error(`API response error: status ${response.status}`);
@@ -33,7 +40,8 @@ async function apiFetch(endpoint, options = {}) {
     const json = await response.json();
     return { data: json, isMock: false };
   } catch (error) {
-    console.warn(`[Sentinel API] Connection failed to ${BASE_URL}${endpoint}. Falling back to simulated mock data. Details: ${error.message}`);
+    clearTimeout(timeoutId);
+    console.warn(`[Sentinel API] Connection failed or timed out for ${BASE_URL}${endpoint}. Falling back to simulated mock data. Details: ${error.message}`);
     return { data: getFallbackData(endpoint), isMock: true };
   }
 }
