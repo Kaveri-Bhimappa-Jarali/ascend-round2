@@ -24,36 +24,102 @@ export default function App() {
     try {
       const summaryResp = await getComplianceSummary();
       const violationsResp = await getViolations();
+      const reportResp = await getComplianceReport().catch(() => null);
+
+      // Defensive violations processing (handles flat list or wrapped object)
+      const violationsList = Array.isArray(violationsResp.data)
+        ? violationsResp.data
+        : (violationsResp.data?.violations || []);
+
+      // Extract resources list if provided by report endpoint
+      const resourcesList = Array.isArray(reportResp?.data?.resources)
+        ? reportResp.data.resources
+        : [];
+
+      // Extract violations_by_severity from backend response
+      const severityMap = summaryResp.data?.violations_by_severity || {};
+
+      // Count provider violations dynamically
+      const awsViolations = violationsList.filter(v => v.provider?.toUpperCase() === 'AWS');
+      const gcpViolations = violationsList.filter(v => v.provider?.toUpperCase() === 'GCP');
+
+      // AWS Provider statistics
+      let awsStats;
+      if (summaryResp.data?.providers?.AWS) {
+        awsStats = summaryResp.data.providers.AWS;
+      } else if (resourcesList.length > 0) {
+        const awsRes = resourcesList.filter(r => r.provider?.toUpperCase() === 'AWS');
+        const awsTotal = awsRes.length;
+        const awsComp = awsRes.filter(r => r.status === 'COMPLIANT' || r.status === 'PASS').length;
+        awsStats = {
+          total: awsTotal,
+          compliant: awsComp,
+          violations: awsViolations.length,
+          percentage: awsTotal > 0 ? Math.round((awsComp / awsTotal) * 100) : (awsViolations.length > 0 ? 0 : 100)
+        };
+      } else {
+        const awsNonCompCount = new Set(awsViolations.map(v => v.resource_id)).size;
+        awsStats = {
+          total: awsNonCompCount,
+          compliant: 0,
+          violations: awsViolations.length,
+          percentage: awsNonCompCount > 0 ? 0 : 100
+        };
+      }
+
+      // GCP Provider statistics
+      let gcpStats;
+      if (summaryResp.data?.providers?.GCP) {
+        gcpStats = summaryResp.data.providers.GCP;
+      } else if (resourcesList.length > 0) {
+        const gcpRes = resourcesList.filter(r => r.provider?.toUpperCase() === 'GCP');
+        const gcpTotal = gcpRes.length;
+        const gcpComp = gcpRes.filter(r => r.status === 'COMPLIANT' || r.status === 'PASS').length;
+        gcpStats = {
+          total: gcpTotal,
+          compliant: gcpComp,
+          violations: gcpViolations.length,
+          percentage: gcpTotal > 0 ? Math.round((gcpComp / gcpTotal) * 100) : (gcpViolations.length > 0 ? 0 : 100)
+        };
+      } else {
+        const gcpNonCompCount = new Set(gcpViolations.map(v => v.resource_id)).size;
+        gcpStats = {
+          total: gcpNonCompCount,
+          compliant: 0,
+          violations: gcpViolations.length,
+          percentage: gcpNonCompCount > 0 ? 0 : 100
+        };
+      }
+
+      const providerStats = {
+        AWS: awsStats,
+        GCP: gcpStats
+      };
 
       // Defensive summary processing
       const defaultSummary = {
         total_resources: 0,
         compliant_resources: 0,
         non_compliant_resources: 0,
+        total_violations: 0,
         compliance_percentage: 100,
         critical: 0,
         high: 0,
         medium: 0,
         low: 0,
-        providers: {
-          AWS: { total: 0, compliant: 0, violations: 0, percentage: 100 },
-          GCP: { total: 0, compliant: 0, violations: 0, percentage: 100 }
-        }
+        providers: providerStats
       };
 
       const summaryData = {
         ...defaultSummary,
         ...summaryResp.data,
-        providers: {
-          AWS: { ...defaultSummary.providers.AWS, ...(summaryResp.data?.providers?.AWS || {}) },
-          GCP: { ...defaultSummary.providers.GCP, ...(summaryResp.data?.providers?.GCP || {}) }
-        }
+        total_violations: summaryResp.data?.total_violations ?? violationsList.length,
+        critical: severityMap.CRITICAL ?? summaryResp.data?.critical ?? 0,
+        high: severityMap.HIGH ?? summaryResp.data?.high ?? 0,
+        medium: severityMap.MEDIUM ?? summaryResp.data?.medium ?? 0,
+        low: severityMap.LOW ?? summaryResp.data?.low ?? 0,
+        providers: providerStats
       };
-
-      // Defensive violations processing (handles flat list or wrapped object)
-      const violationsList = Array.isArray(violationsResp.data)
-        ? violationsResp.data
-        : (violationsResp.data?.violations || []);
 
       setSummary(summaryData);
       setViolations(violationsList);
@@ -305,7 +371,7 @@ export default function App() {
               />
               <MetricCard
                 title="Active Violations"
-                value={summary ? summary.non_compliant_resources : 0}
+                value={summary ? summary.total_violations : 0}
                 icon={ShieldAlert}
                 color="var(--danger-red)"
               />

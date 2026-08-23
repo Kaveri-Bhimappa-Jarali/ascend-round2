@@ -6,6 +6,51 @@ import { mockComplianceSummary, mockViolations } from './mockData';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+const defaultScanPayload = [
+  {
+    provider: "AWS",
+    resource_type: "storage",
+    resource_id: "demo-aws-s3-compliant",
+    resource_name: "aws-prod-data-bucket",
+    configuration: { encryption_enabled: true, logging_enabled: true, public_access: false }
+  },
+  {
+    provider: "AWS",
+    resource_type: "storage",
+    resource_id: "demo-aws-s3-non-compliant",
+    resource_name: "aws-public-unencrypted-bucket",
+    configuration: { encryption_enabled: false, logging_enabled: false, public_access: true }
+  },
+  {
+    provider: "AWS",
+    resource_type: "database",
+    resource_id: "demo-aws-rds-db",
+    resource_name: "aws-legacy-db-instance",
+    configuration: { encryption_enabled: false, logging_enabled: false, public_access: true }
+  },
+  {
+    provider: "GCP",
+    resource_type: "storage",
+    resource_id: "demo-gcp-storage-compliant",
+    resource_name: "gcp-secured-bucket",
+    configuration: { encryption_enabled: true, logging_enabled: true, public_access: false }
+  },
+  {
+    provider: "GCP",
+    resource_type: "storage",
+    resource_id: "demo-gcp-storage-non-compliant",
+    resource_name: "gcp-public-storage-bucket",
+    configuration: { encryption_enabled: true, logging_enabled: false, public_access: true }
+  },
+  {
+    provider: "GCP",
+    resource_type: "database",
+    resource_id: "demo-gcp-cloudsql-db",
+    resource_name: "gcp-dev-sql-instance",
+    configuration: { encryption_enabled: false, logging_enabled: true, public_access: false }
+  }
+];
+
 /**
  * Handle API response parsing and fallback logic.
  */
@@ -53,7 +98,7 @@ function getFallbackData(endpoint) {
   if (endpoint.includes('/violations')) {
     return mockViolations;
   }
-  if (endpoint.includes('/compliance/report')) {
+  if (endpoint.includes('/reports/json') || endpoint.includes('/compliance/report')) {
     return {
       report_title: "CloudCompliance Sentinel Audit Report (Simulation)",
       generated_at: new Date().toISOString(),
@@ -73,10 +118,14 @@ export async function getViolations() {
   return apiFetch('/api/violations');
 }
 
-export async function triggerResourceEvaluation() {
-  return apiFetch('/api/resources/evaluate', { method: 'POST' });
+export async function triggerResourceEvaluation(resources = null) {
+  const payload = resources || defaultScanPayload;
+  return apiFetch('/api/resources/evaluate', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
 }
 
 export async function getComplianceReport() {
-  return apiFetch('/api/compliance/report');
+  return apiFetch('/api/reports/json');
 }
