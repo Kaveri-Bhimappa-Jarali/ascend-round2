@@ -132,6 +132,37 @@ class ComplianceRepository:
             else 100.0
         )
 
+        # Calculate provider-specific stats
+        providers = {}
+        for provider in ["AWS", "GCP"]:
+            provider_total = self.session.query(ResourceDB).filter(ResourceDB.provider == provider).count()
+            provider_failed_count = (
+                self.session.query(ResourceDB.id)
+                .filter(
+                    ResourceDB.provider == provider,
+                    ResourceDB.violations.any(ViolationDB.status == "FAIL")
+                )
+                .count()
+            )
+            provider_compliant_count = max(provider_total - provider_failed_count, 0)
+            provider_violations_count = (
+                self.session.query(ViolationDB.id)
+                .join(ResourceDB)
+                .filter(ResourceDB.provider == provider, ViolationDB.status == "FAIL")
+                .count()
+            )
+            provider_percentage = (
+                round((provider_compliant_count / provider_total) * 100, 2)
+                if provider_total
+                else 100.0
+            )
+            providers[provider] = {
+                "total": provider_total,
+                "compliant": provider_compliant_count,
+                "violations": provider_violations_count,
+                "percentage": provider_percentage,
+            }
+
         return {
             "total_resources": total_resources,
             "compliant_resources": compliant_resources,
@@ -139,6 +170,11 @@ class ComplianceRepository:
             "total_violations": total_violations,
             "violations_by_severity": violations_by_severity,
             "compliance_percentage": compliance_percentage,
+            "providers": providers,
+            "critical": violations_by_severity.get("CRITICAL", 0),
+            "high": violations_by_severity.get("HIGH", 0),
+            "medium": violations_by_severity.get("MEDIUM", 0),
+            "low": violations_by_severity.get("LOW", 0),
         }
 
     def get_full_report_data(self) -> dict[str, object]:

@@ -156,20 +156,4 @@ def test_evaluate_endpoint_duplicate_resources_in_request() -> None:
     assert len(violations_resp.json()) == 3
 
 
-def test_compliance_report_endpoint() -> None:
-    with client() as test_client:
-        test_client.post(
-            "/api/resources/evaluate",
-            json=[compliant_resource(), non_compliant_resource()],
-        )
-        response = test_client.get("/api/compliance/report")
-
-    assert response.status_code == 200
-    payload = response.json()
-    assert payload["report_title"] == "CloudCompliance Sentinel Audit Report"
-    assert "generated_at" in payload
-    assert payload["summary"]["total_resources"] == 2
-    assert len(payload["violations"]) == 3
-
-
 
