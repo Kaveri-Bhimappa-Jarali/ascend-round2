@@ -30,6 +30,16 @@ app.add_middleware(
 # Register API routes
 app.include_router(api_router)
 
+@app.get("/")
+def read_root():
+    return {
+        "message": "CloudCompliance Sentinel API is running successfully.",
+        "version": "1.0.0",
+        "docs_url": "/docs",
+        "health_check": "/health"
+    }
+
+
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
