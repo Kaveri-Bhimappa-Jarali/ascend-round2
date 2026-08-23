@@ -140,3 +140,43 @@ class ComplianceRepository:
             "violations_by_severity": violations_by_severity,
             "compliance_percentage": compliance_percentage,
         }
+
+    def get_full_report_data(self) -> dict[str, object]:
+        summary = self.get_compliance_statistics()
+        resources = self.list_resources()
+        violations = self.list_violations()
+
+        resource_data = []
+        for res in resources:
+            res_violations = [v for v in res.violations if v.status == "FAIL"]
+            status = "NON_COMPLIANT" if res_violations else "COMPLIANT"
+            resource_data.append({
+                "provider": res.provider,
+                "resource_type": res.resource_type,
+                "resource_id": res.resource_id,
+                "resource_name": res.resource_name,
+                "status": status,
+                "configuration": res.configuration,
+                "last_seen": res.last_seen.isoformat() if res.last_seen else None,
+            })
+
+        violation_data = []
+        for v in violations:
+            violation_data.append({
+                "provider": v.resource.provider if v.resource else "UNKNOWN",
+                "resource_type": v.resource.resource_type if v.resource else "UNKNOWN",
+                "resource_id": v.resource_id,
+                "resource_name": v.resource.resource_name if v.resource else v.resource_id,
+                "rule_id": v.rule_id,
+                "severity": v.severity,
+                "message": v.message,
+                "status": v.status,
+                "detected_at": v.detected_at.isoformat() if v.detected_at else None,
+            })
+
+        return {
+            "summary": summary,
+            "resources": resource_data,
+            "violations": violation_data,
+        }
+

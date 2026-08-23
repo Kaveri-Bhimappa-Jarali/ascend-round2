@@ -20,3 +20,15 @@ The seeder inserts:
 4. **GCP Storage Bucket**: Compliant (Encrypted, logging enabled).
 5. **GCP Storage Bucket**: Non-Compliant (Public access allowed).
 6. **GCP Cloud SQL Database**: Non-Compliant (Encryption disabled).
+
+## Running Demo Database Seeder CLI
+
+Populate SQLite with sample multi-cloud resources and generate a JSON audit report:
+```bash
+python backend/seed_demo_data.py
+```
+Options:
+- `--reset-demo`: Clear existing records before seeding.
+- `--no-report`: Skip writing `compliance_report.json` file.
+
+The JSON compliance report is automatically saved to `reports/generated/compliance_report.json` and accessible via `GET /api/reports/json`.
