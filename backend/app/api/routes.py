@@ -111,7 +111,7 @@ def get_json_report(session: Session = Depends(get_session)) -> dict[str, object
 
 
 @router.get("/reports/pdf")
-def get_pdf_report(session: Session = Depends(get_session)) -> FileResponse:
+def get_pdf_report(session: Session = Depends(get_session)):
     """Generate and return complete multi-cloud compliance audit report in PDF format."""
     from fastapi.responses import FileResponse
     service = ComplianceService(session)
