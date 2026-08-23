@@ -24,8 +24,39 @@ export default function App() {
       const summaryResp = await getComplianceSummary();
       const violationsResp = await getViolations();
 
-      setSummary(summaryResp.data);
-      setViolations(violationsResp.data);
+      // Defensive summary processing
+      const defaultSummary = {
+        total_resources: 0,
+        compliant_resources: 0,
+        non_compliant_resources: 0,
+        compliance_percentage: 100,
+        critical: 0,
+        high: 0,
+        medium: 0,
+        low: 0,
+        providers: {
+          AWS: { total: 0, compliant: 0, violations: 0, percentage: 100 },
+          GCP: { total: 0, compliant: 0, violations: 0, percentage: 100 }
+        }
+      };
+
+      const summaryData = {
+        ...defaultSummary,
+        ...summaryResp.data,
+        providers: {
+          AWS: { ...defaultSummary.providers.AWS, ...(summaryResp.data?.providers?.AWS || {}) },
+          GCP: { ...defaultSummary.providers.GCP, ...(summaryResp.data?.providers?.GCP || {}) }
+        }
+      };
+
+      // Defensive violations processing (handles flat list or wrapped object)
+      const violationsList = Array.isArray(violationsResp.data)
+        ? violationsResp.data
+        : (violationsResp.data?.violations || []);
+
+      setSummary(summaryData);
+      setViolations(violationsList);
+      
       // If either endpoint resolved from mock data, report simulated state
       setIsDemoMode(summaryResp.isMock || violationsResp.isMock);
     } catch (err) {
