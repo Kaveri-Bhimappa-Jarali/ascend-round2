@@ -66,5 +66,8 @@ export async function getViolations() {
 }
 
 export async function triggerResourceEvaluation() {
-  return apiFetch('/api/resources/evaluate', { method: 'POST' });
+  return apiFetch('/api/resources/evaluate', {
+    method: 'POST',
+    body: 'null'
+  });
 }
