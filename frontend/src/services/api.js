@@ -53,6 +53,14 @@ function getFallbackData(endpoint) {
   if (endpoint.includes('/violations')) {
     return mockViolations;
   }
+  if (endpoint.includes('/compliance/report')) {
+    return {
+      report_title: "CloudCompliance Sentinel Audit Report (Simulation)",
+      generated_at: new Date().toISOString(),
+      summary: mockComplianceSummary,
+      violations: mockViolations
+    };
+  }
   // Default fallback for triggers/evaluate
   return { status: "evaluation_triggered", evaluations: mockViolations };
 }
@@ -67,4 +75,8 @@ export async function getViolations() {
 
 export async function triggerResourceEvaluation() {
   return apiFetch('/api/resources/evaluate', { method: 'POST' });
+}
+
+export async function getComplianceReport() {
+  return apiFetch('/api/compliance/report');
 }
