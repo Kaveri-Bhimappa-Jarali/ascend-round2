@@ -261,7 +261,7 @@ export default function App() {
               />
               <MetricCard
                 title="Active Violations"
-                value={summary ? summary.non_compliant_resources : 0}
+                value={summary ? (summary.total_violations ?? summary.non_compliant_resources) : 0}
                 icon={ShieldAlert}
                 color="var(--danger-red)"
               />
