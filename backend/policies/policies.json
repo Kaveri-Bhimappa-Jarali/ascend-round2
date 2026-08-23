@@ -1,0 +1,34 @@
+{
+  "rules": [
+    {
+      "id": "ENCRYPTION_REQUIRED",
+      "name": "Encryption Required",
+      "resource_types": ["storage", "database"],
+      "field": "encryption_enabled",
+      "operator": "equals",
+      "expected": true,
+      "severity": "HIGH",
+      "message": "Resource encryption is disabled"
+    },
+    {
+      "id": "LOGGING_REQUIRED",
+      "name": "Audit Logging Required",
+      "resource_types": ["storage", "database", "compute"],
+      "field": "logging_enabled",
+      "operator": "equals",
+      "expected": true,
+      "severity": "MEDIUM",
+      "message": "Resource audit logging is disabled"
+    },
+    {
+      "id": "PUBLIC_EXPOSURE_FORBIDDEN",
+      "name": "Public Exposure Forbidden",
+      "resource_types": ["storage", "database", "vpc"],
+      "field": "public_access",
+      "operator": "equals",
+      "expected": false,
+      "severity": "HIGH",
+      "message": "Resource is publicly accessible"
+    }
+  ]
+}
