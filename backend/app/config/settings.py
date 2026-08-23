@@ -3,6 +3,7 @@ Application environment variables configuration.
 """
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     env: str = "development"
     debug: bool = True
@@ -13,5 +14,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        env_prefix = "CCS_"
+        extra = "ignore"
 
 settings = Settings()
