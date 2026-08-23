@@ -4,16 +4,17 @@ CloudCompliance Sentinel is a lightweight, read-only multi-cloud compliance moni
 
 ---
 
-## 🚀 Module Status: Compliance Engine, Backend DB & JSON Reporting Complete
+## 🚀 Module Status: Fully Integrated and Demo-Ready (Auto-Fallback)
 
-The **Compliance Engine**, **SQLite Database Layer**, **Backend REST APIs**, **JSON Reporting Engine**, and **AWS & GCP Cloud Integrations** are fully implemented, tested, and documented.
+The **Compliance Engine**, **SQLite Database Layer**, **Backend REST APIs**, **PDF & JSON Reporting Engine**, and **AWS & GCP Cloud Integrations** are fully implemented, tested, and documented.
 
 ### Compliance & Backend Features
 * **Configurable Compliance Engine**: Provider-agnostic policy evaluator supporting `equals` and `not_equals` operators across storage, database, and VPC resource types.
 * **SQLite Persistence**: Relational storage for normalized resource configurations and compliance violations with foreign-key cascade enforcement and concurrency-safe savepoints.
-* **JSON Audit Reporting**: Standardized JSON report generator outputting metadata, summary stats, compliance percentages, severity counts, resource matrix, and violation logs to `reports/generated/compliance_report.json`.
-* **REST APIs**: FastAPI endpoints for health probes, evaluations (`POST /api/resources/evaluate`), violations (`GET /api/violations`), compliance summary (`GET /api/compliance/summary`), and JSON audit reports (`GET /api/reports/json`).
-* **Database Seeder CLI**: `seed_demo_data.py` populates SQLite with sample multi-cloud resources and exports JSON reports.
+* **PDF & JSON Audit Reporting**: Standardized JSON and PDF report generators compiling metadata, summary stats, severity counts, and resource violation logs. Reports can be fetched via API or downloaded directly via the UI.
+* **REST APIs**: FastAPI endpoints for health probes, evaluations (`POST /api/resources/evaluate`), violations (`GET /api/violations`), compliance summary (`GET /api/compliance/summary`), JSON reports (`GET /api/reports/json`), and PDF reports (`GET /api/reports/pdf`).
+* **Database Seeder CLI**: `seed_demo_data.py` populates SQLite with sample multi-cloud resources.
+* **Automatic Demo Fallback**: If no active AWS or GCP credentials are found on the machine, the system **automatically falls back to interactive Demo/Mock mode**, allowing immediate evaluation of all features with a single click.
 
 ### Supported Cloud Resources
 * **AWS S3 Buckets**: Scans encryption status, public access block configurations, and audit logging.
@@ -31,8 +32,8 @@ The **Compliance Engine**, **SQLite Database Layer**, **Backend REST APIs**, **J
   * **`backend/run_all_scans.py`**: Combined CLI utility to scan and output both AWS and GCP resources.
   * **`backend/run_aws_scan.py`**: Independent CLI utility to scan and output AWS resources.
   * **`backend/run_gcp_scan.py`**: Independent CLI utility to scan and output GCP resources.
-* **`frontend/`**: Vite + React frontend dashboard.
-* **`reports/`**: JSON compliance report generator module (`JSONReportGenerator`).
+* **`frontend/`**: Vite + React frontend dashboard featuring interactive layout, charts, and direct PDF report download trigger.
+* **`reports/`**: JSON & PDF compliance report generator modules (`JSONReportGenerator`, `PDFReportGenerator`).
 * **`demo/`**: Mock data, walkthrough scripts, and visuals.
 * **`docs/`**: Detailed project documentation (Architecture, APIs, Rules, Setup).
 
