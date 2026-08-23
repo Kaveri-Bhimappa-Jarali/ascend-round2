@@ -35,6 +35,13 @@ class ResourceEvaluationResponse(BaseModel):
     violations: list[ViolationResponse]
 
 
+class ProviderStats(BaseModel):
+    total: int
+    compliant: int
+    violations: int
+    percentage: float
+
+
 class ComplianceSummaryResponse(BaseModel):
     total_resources: int
     compliant_resources: int
@@ -42,6 +49,7 @@ class ComplianceSummaryResponse(BaseModel):
     total_violations: int
     violations_by_severity: dict[str, int]
     compliance_percentage: float
+    providers: dict[str, ProviderStats] | None = None
 
 
 class ResourceDBResponse(BaseModel):
