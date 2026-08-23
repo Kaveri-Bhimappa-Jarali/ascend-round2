@@ -8,18 +8,18 @@ export default function ViolationTable({ violations = [], onSelect }) {
   const [typeFilter, setTypeFilter] = useState('ALL');
 
   // Local filtering logic
-  const filteredViolations = violations.filter(item => {
+  const filteredViolations = Array.isArray(violations) ? violations.filter(item => {
     const matchesSearch = 
-      item.resource_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.rule_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.message.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.resource_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.rule_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.message || '').toLowerCase().includes(searchTerm.toLowerCase());
       
-    const matchesProvider = providerFilter === 'ALL' || item.provider.toUpperCase() === providerFilter;
-    const matchesSeverity = severityFilter === 'ALL' || item.severity.toUpperCase() === severityFilter;
-    const matchesType = typeFilter === 'ALL' || item.resource_type.toLowerCase() === typeFilter.toLowerCase();
+    const matchesProvider = providerFilter === 'ALL' || (item.provider || '').toUpperCase() === providerFilter;
+    const matchesSeverity = severityFilter === 'ALL' || (item.severity || '').toUpperCase() === severityFilter;
+    const matchesType = typeFilter === 'ALL' || (item.resource_type || '').toLowerCase() === typeFilter.toLowerCase();
 
     return matchesSearch && matchesProvider && matchesSeverity && matchesType;
-  });
+  }) : [];
 
   return (
     <div className="glass-panel" style={{ padding: '1.25rem' }}>

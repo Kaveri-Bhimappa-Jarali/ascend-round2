@@ -24,6 +24,7 @@ class ViolationResponse(BaseModel):
     message: str
     status: str
     detected_at: datetime | None = None
+    configuration: dict[str, Any] | None = None
 
 
 class ResourceEvaluationResponse(BaseModel):

@@ -30,6 +30,7 @@ def _violation_to_response(violation: ViolationDB) -> ViolationResponse:
         message=violation.message,
         status=violation.status,
         detected_at=violation.detected_at,
+        configuration=violation.resource.configuration,
     )
 
 
