@@ -1,15 +1,11 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
+from sqlalchemy import distinct, func
 
 from app.db.database import get_session
 from app.db.models import ResourceSnapshot, Violation
 
 router = APIRouter()
-
-
-def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
 
 
 @router.get("/health")
@@ -22,8 +18,14 @@ async def summary() -> dict[str, object]:
     with get_session() as session:
         total_resources = session.query(ResourceSnapshot).count()
         violations = session.query(Violation).filter(Violation.status == "FAIL").count()
+        failed_resources = (
+            session.query(func.count(distinct(Violation.resource_snapshot_id)))
+            .filter(Violation.status == "FAIL")
+            .scalar()
+            or 0
+        )
 
-    compliant_resources = max(total_resources - violations, 0)
+    compliant_resources = max(total_resources - failed_resources, 0)
     compliance_score = (
         round((compliant_resources / total_resources) * 100, 2)
         if total_resources
@@ -64,9 +66,11 @@ async def providers() -> dict[str, dict[str, object]]:
 
 
 @router.post("/scan")
-async def scan() -> dict[str, object]:
-    return {
-        "status": "accepted",
-        "message": "Scan pipeline is scheduled for Phase 4",
-        "started_at": _utc_now(),
-    }
+async def scan() -> JSONResponse:
+    return JSONResponse(
+        status_code=501,
+        content={
+            "status": "not_implemented",
+            "message": "Scan pipeline is not implemented yet.",
+        },
+    )

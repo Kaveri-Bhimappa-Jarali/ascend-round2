@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterator
 
 from sqlalchemy import create_engine
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
@@ -27,7 +28,24 @@ class Base(DeclarativeBase):
 def init_db() -> None:
     from app.db import models  # noqa: F401
 
+    _drop_legacy_phase1_violations_table()
     Base.metadata.create_all(bind=engine)
+
+
+def _drop_legacy_phase1_violations_table() -> None:
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
+    inspector = inspect(engine)
+    if "violations" not in inspector.get_table_names():
+        return
+
+    columns = {column["name"] for column in inspector.get_columns("violations")}
+    if "resource_snapshot_id" in columns:
+        return
+
+    with engine.begin() as connection:
+        connection.execute(text("DROP TABLE violations"))
 
 
 @contextmanager

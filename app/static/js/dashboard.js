@@ -10,6 +10,13 @@ function setText(id, value) {
   document.getElementById(id).textContent = value;
 }
 
+function appendText(parent, tagName, text) {
+  const element = document.createElement(tagName);
+  element.textContent = text;
+  parent.appendChild(element);
+  return element;
+}
+
 async function loadSummary() {
   const summary = await fetchJson("/api/summary");
   setText("total-resources", summary.total_resources);
@@ -22,16 +29,14 @@ async function loadSummary() {
 async function loadProviders() {
   const providers = await fetchJson("/api/providers");
   const container = document.getElementById("providers");
-  container.innerHTML = "";
+  container.replaceChildren();
 
   Object.entries(providers).forEach(([name, details]) => {
     const panel = document.createElement("article");
-    panel.innerHTML = `
-      <span>${name.toUpperCase()}</span>
-      <strong>${details.status}</strong>
-      <p>Resources: ${details.resources}</p>
-      <p>Violations: ${details.violations}</p>
-    `;
+    appendText(panel, "span", name.toUpperCase());
+    appendText(panel, "strong", details.status);
+    appendText(panel, "p", `Resources: ${details.resources}`);
+    appendText(panel, "p", `Violations: ${details.violations}`);
     container.appendChild(panel);
   });
 }
@@ -39,26 +44,33 @@ async function loadProviders() {
 async function loadViolations() {
   const violations = await fetchJson("/api/violations");
   const table = document.getElementById("violation-table");
+  table.replaceChildren();
 
   if (violations.length === 0) {
-    table.innerHTML = '<tr><td colspan="6">No violations found.</td></tr>';
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 7;
+    cell.textContent = "No violations found.";
+    row.appendChild(cell);
+    table.appendChild(row);
     return;
   }
 
-  table.innerHTML = violations
-    .map(
-      (violation) => `
-        <tr>
-          <td>-</td>
-          <td>${violation.resource_id}</td>
-          <td>${violation.rule_id}</td>
-          <td>${violation.severity}</td>
-          <td>${violation.status}</td>
-          <td>${violation.detected_at}</td>
-        </tr>
-      `,
-    )
-    .join("");
+  violations.forEach((violation) => {
+    const row = document.createElement("tr");
+    [
+      violation.provider,
+      violation.resource_type,
+      violation.resource_id,
+      violation.rule_id,
+      violation.severity,
+      violation.status,
+      violation.detected_at,
+    ].forEach((value) => {
+      appendText(row, "td", value ?? "-");
+    });
+    table.appendChild(row);
+  });
 }
 
 async function loadResources() {

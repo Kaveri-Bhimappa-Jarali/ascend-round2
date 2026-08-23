@@ -36,11 +36,22 @@ Phase 1 establishes the application foundation. Compliance rules, demo scanning,
 
 ## Setup
 
-```bash
+### Windows
+
+```powershell
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env
+```
+
+### macOS/Linux
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
 ## Demo Mode
@@ -76,11 +87,21 @@ Rules will be loaded from `policies/policies.json` in Phase 2.
 ## API Endpoints
 
 - `GET /`
+- `GET /api/health`
 - `GET /api/summary`
 - `GET /api/resources`
 - `GET /api/violations`
 - `GET /api/providers`
 - `POST /api/scan`
+
+Health response:
+
+```json
+{
+  "status": "ok",
+  "service": "cloud-compliance-sentinel"
+}
+```
 
 ## Read-Only Guarantee
 
