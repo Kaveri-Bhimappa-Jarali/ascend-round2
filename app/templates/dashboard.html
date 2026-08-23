@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CloudCompliance Sentinel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>CloudCompliance Sentinel</h1>
+        <p>Multi-Cloud Compliance Monitoring</p>
+      </div>
+      <span class="readonly">READ-ONLY MONITORING</span>
+    </header>
+
+    <main>
+      <section class="summary-grid" aria-label="Compliance summary">
+        <article>
+          <span>Total Resources</span>
+          <strong id="total-resources">0</strong>
+        </article>
+        <article>
+          <span>Compliant Resources</span>
+          <strong id="compliant-resources">0</strong>
+        </article>
+        <article>
+          <span>Violations</span>
+          <strong id="violations">0</strong>
+        </article>
+        <article>
+          <span>Compliance Score</span>
+          <strong id="compliance-score">100%</strong>
+        </article>
+      </section>
+
+      <section class="toolbar">
+        <p id="score-label">Internal compliance score, not an official certification score</p>
+        <button id="run-scan" type="button">Run Scan</button>
+      </section>
+
+      <section class="content-grid">
+        <div>
+          <h2>Provider Status</h2>
+          <div id="providers" class="provider-grid"></div>
+        </div>
+
+        <div>
+          <h2>Violations</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>Resource</th>
+                <th>Rule</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Detected At</th>
+              </tr>
+            </thead>
+            <tbody id="violation-table">
+              <tr>
+                <td colspan="6">No violations found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>Resources</h2>
+        <pre id="resources">[]</pre>
+      </section>
+    </main>
+
+    <script src="/static/js/dashboard.js"></script>
+  </body>
+</html>
