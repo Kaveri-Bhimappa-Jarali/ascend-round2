@@ -1,0 +1,219 @@
+/* Global Styling and Dashboard Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --bg-card: rgba(30, 41, 59, 0.6);
+  --border-color: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  
+  /* Status Accent Colors */
+  --compliant-green: #10b981;
+  --compliant-green-dim: rgba(16, 185, 129, 0.15);
+  --warning-amber: #f59e0b;
+  --warning-amber-dim: rgba(245, 158, 11, 0.15);
+  --danger-red: #ef4444;
+  --danger-red-dim: rgba(239, 68, 68, 0.15);
+  
+  --sky-blue: #38bdf8;
+  --sky-blue-dim: rgba(56, 189, 248, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Glassmorphism Card Style */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-panel:hover {
+  border-color: #334155;
+}
+
+/* Dashboard Metrics Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* SVG Compliance Gauge Ring Animation */
+.ring-bg {
+  stroke: #1e293b;
+}
+
+.ring-indicator {
+  transition: stroke-dashoffset 0.6s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Severity Tag Badges */
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.severity-badge.critical {
+  background-color: var(--danger-red-dim);
+  color: var(--danger-red);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.severity-badge.high {
+  background-color: var(--danger-red-dim);
+  color: var(--danger-red);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.severity-badge.medium {
+  background-color: var(--warning-amber-dim);
+  color: var(--warning-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.severity-badge.low {
+  background-color: var(--sky-blue-dim);
+  color: var(--sky-blue);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Provider Tag Badges */
+.provider-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.provider-badge.aws {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.provider-badge.gcp {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Table Design */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.custom-table th {
+  padding: 1rem 1.25rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.custom-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.custom-table tbody tr:hover {
+  background-color: rgba(30, 41, 59, 0.3);
+}
+
+/* slide out drawer animation */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(2, 6, 23, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  overflow-y: auto;
+  z-index: 101;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
