@@ -1,5 +1,6 @@
 """API endpoint definitions."""
 
+import datetime
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -97,3 +98,31 @@ def get_json_report(session: Session = Depends(get_session)) -> dict[str, object
 
     service = ComplianceService(session)
     return service.generate_json_report()
+
+
+@router.get("/compliance/report")
+def get_compliance_report(session: Session = Depends(get_session)) -> dict[str, object]:
+    """Generate a compliance status report in JSON format."""
+
+    service = ComplianceService(session)
+    summary = service.get_summary()
+    violations = [_violation_to_response(v) for v in service.get_violations()]
+
+    return {
+        "report_title": "CloudCompliance Sentinel Audit Report",
+        "generated_at": datetime.datetime.now().isoformat(),
+        "summary": summary,
+        "violations": [
+            {
+                "provider": v.provider,
+                "resource_type": v.resource_type,
+                "resource_id": v.resource_id,
+                "resource_name": v.resource_name,
+                "rule_id": v.rule_id,
+                "severity": v.severity,
+                "message": v.message,
+                "status": v.status,
+            }
+            for v in violations
+        ],
+    }

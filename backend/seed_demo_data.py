@@ -110,7 +110,7 @@ def seed_database(reset: bool = False, export_report: bool = True) -> dict:
             print("[INFO] Clearing existing demo resources and violations (--reset-demo enabled)...")
             session.query(ViolationDB).filter(ViolationDB.resource_id.like("demo-%")).delete(synchronize_session=False)
             session.query(ResourceDB).filter(ResourceDB.resource_id.like("demo-%")).delete(synchronize_session=False)
-            session.commit()
+
 
 
         service = ComplianceService(session)
