@@ -242,3 +242,163 @@ def test_aws_collector_demo_mode():
     for r in resources:
         assert r.provider == "AWS"
         assert r.resource_id.startswith("demo-")
+
+
+# ====================================================
+# GCP COLLECTORS TESTS
+# ====================================================
+from app.collectors.gcp.client import GCPClient
+from app.collectors.gcp.storage import StorageCollector as GCPStorageCollector
+from app.collectors.gcp.cloud_sql import CloudSQLCollector as GCPCloudSQLCollector
+from app.collectors.gcp.vpc import VPCCollector as GCPVPCCollector
+from app.collectors.gcp import GCPCollector
+
+# ----------------------------------------------------
+# 1. GCS Storage Collector Tests
+# ----------------------------------------------------
+def test_gcs_collector_compliant_bucket():
+    mock_client = MagicMock()
+    mock_gcp_client = MagicMock(spec=GCPClient)
+    mock_gcp_client.get_storage_client.return_value = mock_client
+    mock_gcp_client.project_id = "test-project"
+
+    mock_bucket = MagicMock()
+    mock_bucket.name = "compliant-bucket"
+    mock_bucket.location = "US-CENTRAL1"
+    mock_bucket.iam_configuration.public_access_prevention = "enforced"
+    mock_bucket.logging = {"logBucket": "logs-bucket"}
+    mock_client.list_buckets.return_value = [mock_bucket]
+
+    collector = GCPStorageCollector(gcp_client=mock_gcp_client)
+    resources = collector.collect_resources()
+
+    assert len(resources) == 1
+    res = resources[0]
+    assert res.provider == "GCP"
+    assert res.resource_type == "storage"
+    assert res.resource_id == "compliant-bucket"
+    assert res.configuration["encryption_enabled"] is True
+    assert res.configuration["public_access"] is False
+    assert res.configuration["logging_enabled"] is True
+    assert res.configuration["region"] == "us-central1"
+
+
+def test_gcs_collector_non_compliant_bucket():
+    mock_client = MagicMock()
+    mock_gcp_client = MagicMock(spec=GCPClient)
+    mock_gcp_client.get_storage_client.return_value = mock_client
+    mock_gcp_client.project_id = "test-project"
+
+    mock_bucket = MagicMock()
+    mock_bucket.name = "public-bucket"
+    mock_bucket.location = "US"
+    mock_bucket.iam_configuration.public_access_prevention = "inherited"
+    mock_bucket.logging = None
+    
+    # Mock IAM policy bindings for public access check
+    mock_policy = MagicMock()
+    mock_binding = {"members": ["allUsers"], "role": "roles/storage.objectViewer"}
+    mock_policy.bindings = [mock_binding]
+    mock_bucket.get_iam_policy.return_value = mock_policy
+    
+    mock_client.list_buckets.return_value = [mock_bucket]
+
+    collector = GCPStorageCollector(gcp_client=mock_gcp_client)
+    resources = collector.collect_resources()
+
+    assert len(resources) == 1
+    res = resources[0]
+    assert res.resource_id == "public-bucket"
+    assert res.configuration["public_access"] is True
+    assert res.configuration["logging_enabled"] is False
+
+
+# ----------------------------------------------------
+# 2. Cloud SQL Collector Tests
+# ----------------------------------------------------
+def test_gcp_cloud_sql_collector():
+    mock_service = MagicMock()
+    mock_gcp_client = MagicMock(spec=GCPClient)
+    mock_gcp_client.get_sql_service.return_value = mock_service
+    mock_gcp_client.project_id = "test-project"
+
+    mock_instance = {
+        "name": "sql-db",
+        "databaseVersion": "POSTGRES_14",
+        "region": "us-central1",
+        "settings": {
+            "ipConfiguration": {
+                "ipv4Enabled": True,
+                "requireSsl": True
+            },
+            "databaseFlags": [
+                {"name": "log_connections", "value": "on"}
+            ]
+        }
+    }
+    
+    mock_service.instances.return_value.list.return_value.execute.return_value = {
+        "items": [mock_instance]
+    }
+
+    collector = GCPCloudSQLCollector(gcp_client=mock_gcp_client)
+    resources = collector.collect_resources()
+
+    assert len(resources) == 1
+    res = resources[0]
+    assert res.provider == "GCP"
+    assert res.resource_type == "database"
+    assert res.resource_id == "sql-db"
+    assert res.configuration["encryption_enabled"] is True
+    assert res.configuration["public_access"] is True
+    assert res.configuration["logging_enabled"] is True
+
+
+# ----------------------------------------------------
+# 3. GCP VPC Collector Tests
+# ----------------------------------------------------
+def test_gcp_vpc_collector():
+    mock_service = MagicMock()
+    mock_gcp_client = MagicMock(spec=GCPClient)
+    mock_gcp_client.get_compute_service.return_value = mock_service
+    mock_gcp_client.project_id = "test-project"
+
+    mock_network = {
+        "id": 987654321,
+        "name": "custom-vpc",
+        "routingConfig": {
+            "routingMode": "GLOBAL"
+        },
+        "autoCreateSubnetworks": False,
+        "subnetworks": ["subnet-url-1", "subnet-url-2"]
+    }
+    
+    mock_service.networks.return_value.list.return_value.execute.return_value = {
+        "items": [mock_network]
+    }
+
+    collector = GCPVPCCollector(gcp_client=mock_gcp_client)
+    resources = collector.collect_resources()
+
+    assert len(resources) == 1
+    res = resources[0]
+    assert res.provider == "GCP"
+    assert res.resource_type == "vpc"
+    assert res.resource_id == "987654321"
+    assert res.configuration["routing_mode"] == "global"
+    assert res.configuration["auto_create_subnetworks"] is False
+    assert res.configuration["subnets_count"] == 2
+
+
+# ----------------------------------------------------
+# 4. GCPCollector (Demo Mode) Tests
+# ----------------------------------------------------
+def test_gcp_collector_demo_mode():
+    collector = GCPCollector(demo_mode=True)
+    resources = collector.collect_resources()
+
+    assert len(resources) == 5
+    for r in resources:
+        assert r.provider == "GCP"
+        assert r.resource_id.startswith("demo-gcp-")
+

@@ -4,25 +4,31 @@ CloudCompliance Sentinel is a lightweight, read-only multi-cloud compliance moni
 
 ---
 
-## 🚀 Module Status: AWS Integration Complete
+## 🚀 Module Status: AWS & GCP Integrations Complete
 
-The **AWS Cloud Integration** module is fully implemented, tested, and documented. 
+The **AWS Cloud Integration** and **GCP Cloud Integration** modules are fully implemented, tested, and documented.
 
-### Supported Resources
+### Supported AWS Resources
 * **S3 Buckets**: Scans encryption status, public access block configurations, and audit logging.
 * **RDS Databases**: Scans storage encryption, engine versions, public accessibility, and CloudWatch logging exports.
-* **VPC Networks**: Scans CIDR blocks, states, defaults, and tag names.
+* **VPC Networks**: Scans CIDR blocks, states, defaults, and tag Names.
+
+### Supported GCP Resources
+* **GCS Storage Buckets**: Scans locations, CMEK configurations, uniform bucket-level access settings, and IAM-based public bindings.
+* **Cloud SQL Databases**: Scans engine versions, SSL requirements, public IP settings, and database logging flags.
+* **VPC Networks**: Scans routing modes, subnet counts, and auto-creation flags.
 
 ### Key Features
-* **Zero-Credential Demo Mode**: Automatically falls back to Demo Mode if credentials are not found, returning mock compliant/non-compliant AWS resources for demo videos or presentations.
-* **Fail-Safe Processing**: Scans ignore individual bucket failures (e.g. AccessDenied on specific folders) to preserve partial scan outputs instead of crashing.
-* **Abstract Interface**: Converts boto3 responses into a standard `ResourceModel` format consumed directly by the Compliance Engine.
+* **Zero-Credential Demo Mode**: Automatically falls back to Demo Mode if credentials are not found, returning mock compliant/non-compliant cloud resources for demo videos or presentations.
+* **Fail-Safe Processing**: Scans ignore individual bucket or instance failures (e.g. AccessDenied on specific folders) to preserve partial scan outputs instead of crashing.
+* **Abstract Interface**: Converts SDK/API responses into a standard `ResourceModel` format consumed directly by the Compliance Engine.
 
 ---
 
 ## 🛠️ Project Structure
 * **`backend/`**: FastAPI backend application with Compliance Engine and Database layers.
   * **`backend/run_aws_scan.py`**: Independent CLI utility to scan and output AWS resources.
+  * **`backend/run_gcp_scan.py`**: Independent CLI utility to scan and output GCP resources.
 * **`frontend/`**: Vite + React frontend dashboard.
 * **`reports/`**: PDF/HTML compliance report generator module.
 * **`demo/`**: Mock data, walkthrough scripts, and visuals.
@@ -30,7 +36,7 @@ The **AWS Cloud Integration** module is fully implemented, tested, and documente
 
 ---
 
-## 💻 Running the AWS Scanner CLI
+## 💻 Running the Scanner CLIs
 
 1. Navigate to the `backend/` directory:
    ```bash
@@ -40,14 +46,24 @@ The **AWS Cloud Integration** module is fully implemented, tested, and documente
    ```bash
    pip install -r requirements.txt
    ```
-3. Run the CLI tool:
-   * **Demo/Mock Mode** (Run instantly with no credentials):
+3. Run the CLI tools:
+   * **AWS Scanner (Demo Mode)**:
      ```bash
      python run_aws_scan.py --demo
      ```
-   * **Real AWS Scan** (Scans actual cloud configurations using credentials in `.env`):
+   * **AWS Scanner (Real Scan)**:
      ```bash
      python run_aws_scan.py --real
      ```
+   * **GCP Scanner (Demo Mode)**:
+     ```bash
+     python run_gcp_scan.py --demo
+     ```
+   * **GCP Scanner (Real Scan)**:
+     ```bash
+     python run_gcp_scan.py --real
+     ```
 
-For full integration details and IAM permission policy checklist, refer to the [docs/aws-integration.md](docs/aws-integration.md) contract guide.
+For full integration contracts and permissions check-lists, refer to:
+* **AWS Integration Guide**: [docs/aws-integration.md](docs/aws-integration.md)
+* **GCP Integration Guide**: [docs/gcp-integration.md](docs/gcp-integration.md)
