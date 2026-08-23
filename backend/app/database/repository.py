@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Iterable
 
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 
 from app.compliance.rules import RuleEvaluation
@@ -30,23 +31,36 @@ class ComplianceRepository:
         )
 
         if existing is None:
-            existing = ResourceDB(
-                provider=resource.provider,
-                resource_type=resource.resource_type,
-                resource_id=resource.resource_id,
-                resource_name=resource.resource_name,
-                configuration=resource.configuration,
-                last_seen=datetime.now(timezone.utc),
-            )
-            self.session.add(existing)
-            self.session.flush()
-            return existing
+            try:
+                with self.session.begin_nested():
+                    existing = ResourceDB(
+                        provider=resource.provider,
+                        resource_type=resource.resource_type,
+                        resource_id=resource.resource_id,
+                        resource_name=resource.resource_name,
+                        configuration=resource.configuration,
+                        last_seen=datetime.now(timezone.utc),
+                    )
+                    self.session.add(existing)
+                    self.session.flush()
+                    return existing
+            except IntegrityError:
+                existing = (
+                    self.session.query(ResourceDB)
+                    .filter(
+                        ResourceDB.provider == resource.provider,
+                        ResourceDB.resource_type == resource.resource_type,
+                        ResourceDB.resource_id == resource.resource_id,
+                    )
+                    .one()
+                )
 
         existing.resource_name = resource.resource_name
         existing.configuration = resource.configuration
         existing.last_seen = datetime.now(timezone.utc)
         self.session.flush()
         return existing
+
 
     def replace_violations(
         self,
