@@ -39,8 +39,15 @@ def evaluate_resources(
     """Evaluate resource configurations against active compliance policies."""
 
     service = ComplianceService(session)
-    resource_models = [ResourceModel(**resource.model_dump()) for resource in resources]
-    evaluations = service.evaluate_resources(resource_models)
+    seen = set()
+    unique_models = []
+    for resource in resources:
+        key = (resource.provider, resource.resource_type, resource.resource_id)
+        if key not in seen:
+            seen.add(key)
+            unique_models.append(ResourceModel(**resource.model_dump()))
+    evaluations = service.evaluate_resources(unique_models)
+
 
     return [
         ResourceEvaluationResponse(

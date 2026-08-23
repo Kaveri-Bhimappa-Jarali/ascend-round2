@@ -22,7 +22,11 @@ def configure_database(database_url: str | None = None) -> None:
 
     global engine, SessionLocal
 
+    if engine is not None:
+        engine.dispose()
+
     url = database_url or settings.database_url
+
     connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
     engine = create_engine(url, connect_args=connect_args)
 

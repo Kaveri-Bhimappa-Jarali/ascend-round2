@@ -1,7 +1,7 @@
 """
 Application environment variables configuration.
 """
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -12,9 +12,11 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./compliance_sentinel.db"
     demo_mode: bool = True
 
-    class Config:
-        env_file = ".env"
-        env_prefix = "CCS_"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="CCS_",
+        extra="ignore",
+    )
+
 
 settings = Settings()

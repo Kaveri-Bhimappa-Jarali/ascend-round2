@@ -151,7 +151,8 @@ def test_evaluate_endpoint_duplicate_resources_in_request() -> None:
         violations_resp = test_client.get("/api/violations")
 
     assert response.status_code == 200
-    assert len(response.json()) == 2
+    assert len(response.json()) == 1
     assert violations_resp.status_code == 200
     assert len(violations_resp.json()) == 3
+
 
